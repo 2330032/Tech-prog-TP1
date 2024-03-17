@@ -34,7 +34,7 @@ void Push(Node** head, Item item) {
 		*head = newNode;
 	}
 	else {
-		newNode->prev = *head;
+		newNode->next = *head;
 		(*head)->prev = newNode;
 		*head = newNode;
 	}
@@ -56,7 +56,7 @@ void AlphabeticalSort(Node** head) {
 	Node* i;
 	Item temp;
 
-	if (*head = NULL || (*head)->next == NULL) {
+	if (*head == NULL || (*head)->next == NULL) {
 		return;
 	}
 
@@ -71,6 +71,112 @@ void AlphabeticalSort(Node** head) {
 	}
 }
 
+Item* FindItemByPosition(Node* head, int position)
+{
+	Node* current = head;
+	int i = 0;
+
+	while (current != NULL && i < position)
+	{
+		current = current->next;
+		i++;
+	}
+	if (i == position && current != NULL)
+	{
+		return &(current->data);
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+Item* FindItemByName(Node* head, const char* name)
+{
+	Node* current = head;
+
+	while (current != NULL)
+	{
+		if (strcmp(current->data.name, name) == 0)
+		{
+			return &(current->data);
+		}
+		current = current->next;
+	}
+	return NULL;
+}
+
+int ItemQuantity(Node* head)
+{
+	int i = 0;
+	Node* current = head;
+
+	while (current != NULL)
+	{
+		i++;
+		current = current->next;
+	}
+	return i;
+}
+
+void AddRandomItem(Node** head, const char* file)
+{
+	FILE* f = fopen(file, "r");
+
+	if (f == NULL) {
+		printf("Error opening file\n");
+		return;
+	}
+
+	int line_count = 0;
+	char* line = NULL;
+	size_t len = 0;
+	size_t read;
+
+	while ((read = getline(&line, &len, f)) != -1) {
+		line_count++;
+	}
+	rewind(f);
+
+	srand(time(NULL));
+	int random_line = rand() % line_count;
+
+	for (int i = 0; i < random_line; i++) {
+		getline(&line, &len, f);
+	}
+	while ((read = getline(&line, &len, f)) != -1) {
+		char* context = NULL;
+		char* token = strtok_s(line,",", &context);
+		int i = 0;
+
+		Item Item;
+		while (token != NULL) {
+			if (i == 1) {
+				strcpy_s(Item.name, sizeof(Item.name), token);
+			}
+			else if (i == 3) {
+				Item.value = atoi(token);
+				printf("*Added random item*\nItem name: %s \nItem price: %d\n", Item.name, Item.value);
+			}
+			token = strtok_s(NULL, ",", &context);
+			i++;
+		}
+	}
+	fclose(f);
+} 
+
+void PrintInventory(Node* head) 
+{
+	Node* current = head;
+
+	printf("Inventory: \n");
+
+	while (current != NULL)	
+	{
+		printf("Item name: %s\nItem value: %d\n", current->data.name, current->data.value);
+		current = current->next;
+	}
+}
 
 size_t getline(char** lineptr, size_t* n, FILE* stream);
 
@@ -89,19 +195,19 @@ int main(int argc, char** argv) {
 	while ((read = getline(&line, &len, f)) != -1) {
 		char* context = NULL;
 		char* token = strtok_s(line, ",", &context);
-		int count = 0;
+		int i = 0;
 
 		Item Item;
 		while (token != NULL) {
-			if (count == 1) {
+			if (i == 1) {
 				strcpy_s(Item.name, sizeof(Item.name), token);
 			}
-			else if (count == 3) {
+			else if (i == 3) {
 				Item.value = atoi(token);
-				printf("Item name: %s \nPrice: %d\n", Item.name, Item.value);
+				printf("Item name: %s \nItem price: %d\n", Item.name, Item.value);
 			}
 			token = strtok_s(NULL, ",", &context);
-			count++;
+			i++;
 		}
 
 	}
