@@ -1,0 +1,9 @@
+1- See inventory
+2- Add to inventory
+3- Delete item from inventory
+4- Sort inventory
+	a)By name
+	b)By value
+5- Find item by position
+6- Find item by name
+7- See total number of items in inventory

@@ -15,6 +15,8 @@ struct Node {
 	Node* next;
 };
 
+size_t getline(char** lineptr, size_t* n, FILE* stream);
+
 Node* CreateNewNode(Item item) {
 	Node* node = (Node*)malloc(sizeof(Node));
 
@@ -38,6 +40,7 @@ void Push(Node** head, Item item) {
 		(*head)->prev = newNode;
 		*head = newNode;
 	}
+	printf("Item added to inventory.");
 }
 
 Item Pop(Node** head) {
@@ -48,6 +51,7 @@ Item Pop(Node** head) {
 	if (*head != NULL) {
 		(*head)->prev = NULL;
 	}
+	printf("Item deleted to inventory.");
 	return item;
 }
 
@@ -146,7 +150,7 @@ void AddRandomItem(Node** head, const char* file)
 	}
 	while ((read = getline(&line, &len, f)) != -1) {
 		char* context = NULL;
-		char* token = strtok_s(line,",", &context);
+		char* token = strtok_s(line, ",", &context);
 		int i = 0;
 
 		Item Item;
@@ -163,22 +167,21 @@ void AddRandomItem(Node** head, const char* file)
 		}
 	}
 	fclose(f);
-} 
+}
 
-void PrintInventory(Node* head) 
+void PrintInventory(Node* head)
 {
 	Node* current = head;
 
-	printf("Inventory: \n");
+	printf("Here is your current inventory: \n\n");
 
-	while (current != NULL)	
+	while (current != NULL)
 	{
-		printf("Item name: %s\nItem value: %d\n", current->data.name, current->data.value);
+		printf("Item name: %s\nItem value: %d\n\n", current->data.name, current->data.value);
 		current = current->next;
 	}
 }
 
-size_t getline(char** lineptr, size_t* n, FILE* stream);
 
 int main(int argc, char** argv) {
 	FILE* f = fopen("data.csv", "r");
@@ -204,16 +207,56 @@ int main(int argc, char** argv) {
 			}
 			else if (i == 3) {
 				Item.value = atoi(token);
-				printf("Item name: %s \nItem price: %d\n", Item.name, Item.value);
 			}
 			token = strtok_s(NULL, ",", &context);
 			i++;
 		}
 
 	}
-
 	fclose(f);
-	return 0;
+
+	int choice;
+
+	printf("Welcome! \n\nWhat would you like to do?\n\nChoose from the following options:\n\n");
+	printf("[1] - See inventory\n[2] - Add to inventory\n[3] - Delete item from inventory\n[4] - Sort inventory\n[5] - Find item by position\n[6] - Find item by name\n[7] - See total number of items in inventory\n[8] - Exit");
+	printf("\nChoice:");
+	scanf("%d", &choice);
+
+
+	while (choice != 8) {
+
+		if (choice == 1) {
+
+			PrintInventory();
+		}
+		else if (choice == 2) {
+			Push();
+		}
+		else if (choice == 3) {
+			Pop();
+		}
+		else if (choice == 4) {
+			printf("Would you like to sort items [1] by name or [2] by value?\n\n ");
+			scanf("%d", &choice);
+
+			if (choice == 1) {
+				AlphabeticalSort();
+			}
+			else if (choice == 2) {
+
+			}
+		}
+		else if (choice == 5) {
+			FindItemByPosition();
+		}
+		else if (choice == 6) {
+			FindItemByName();
+		}
+		else if (choice == 7) {
+			ItemQuantity();
+		}
+	}
+	printf("Goodbye!");
 }
 
 size_t getline(char** lineptr, size_t* n, FILE* stream) {
