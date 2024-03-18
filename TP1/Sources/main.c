@@ -40,7 +40,6 @@ void Push(Node** head, Item item) {
 		(*head)->prev = newNode;
 		*head = newNode;
 	}
-	printf("Item added to inventory.");
 }
 
 Item Pop(Node** head) {
@@ -51,11 +50,11 @@ Item Pop(Node** head) {
 	if (*head != NULL) {
 		(*head)->prev = NULL;
 	}
-	printf("Item deleted to inventory.");
+	printf("Item deleted from inventory.");
 	return item;
 }
 
-void AlphabeticalSort(Node** head) {
+void SortByName(Node** head) {
 	Node* current;
 	Node* i;
 	Item temp;
@@ -67,6 +66,30 @@ void AlphabeticalSort(Node** head) {
 	for (current = *head; current->next != NULL; current = current->next) {
 		for (i = current->next; i != NULL; i = i->next) {
 			if (strcmp(current->data.name, i->data.name) > 0) {
+				temp = current->data;
+				current->data = i->data;
+				i->data = temp;
+			}
+		}
+	}
+}
+
+void SortByValue(Node** head)
+{
+	Node* current;
+	Node* i;
+	Item temp;
+
+	if (*head == NULL || (*head)->next == NULL)
+	{
+		return;
+	}
+	for (current = *head; current->next != NULL; current = current->next)
+	{
+		for (i = current->next; i != NULL; i = i->next)
+		{
+			if (current->data.value > i->data.value)
+			{
 				temp = current->data;
 				current->data = i->data;
 				i->data = temp;
@@ -110,6 +133,45 @@ Item* FindItemByName(Node* head, const char* name)
 	return NULL;
 }
 
+void DeleteItemByName(Node** head, const char* name)
+{
+	if (name == NULL)
+	{
+		printf("Item not found. Make sure item name is valid.\n");
+		return;
+	}
+	Node* current = *head;
+
+	while (current != NULL)
+	{
+		if (strcmp(current->data.name, name) == 0)
+		{
+			Pop(head);
+			printf("Item named %s  was deleted from inventory.", name);
+			return;
+		}
+		current = current->next;
+	}
+	printf("No item by the name %s was found in inventory.", name);
+	return;
+}
+
+void DeleteItemByPosition(Node** head, int position)
+{
+	if (position == NULL)
+	{
+		printf("Item not found. Make sure position is valid.");
+		return;
+	}
+
+	Node* foundItem = FindItemByPosition(*head, position);
+	if (foundItem != NULL)
+	{
+		Pop(head);
+		printf("Item at position %d was successfully deleted from inventory.", position);
+	}
+}
+
 int ItemQuantity(Node* head)
 {
 	int i = 0;
@@ -125,6 +187,7 @@ int ItemQuantity(Node* head)
 
 void AddRandomItem(Node** head, const char* file)
 {
+
 	FILE* f = fopen(file, "r");
 
 	if (f == NULL) {
@@ -160,11 +223,12 @@ void AddRandomItem(Node** head, const char* file)
 			}
 			else if (i == 3) {
 				Item.value = atoi(token);
-				printf("*Added random item*\nItem name: %s \nItem price: %d\n", Item.name, Item.value);
 			}
 			token = strtok_s(NULL, ",", &context);
 			i++;
 		}
+		printf("\n\nAdded random item to inventory\nItem name: %s \nItem price: %d\n", Item.name, Item.value);
+		Push(head, Item);
 	}
 	fclose(f);
 }
@@ -173,7 +237,7 @@ void PrintInventory(Node* head)
 {
 	Node* current = head;
 
-	printf("Here is your current inventory: \n\n");
+	printf("\n\nHere is your current inventory: \n\n");
 
 	while (current != NULL)
 	{
@@ -184,6 +248,8 @@ void PrintInventory(Node* head)
 
 
 int main(int argc, char** argv) {
+	Node* head = NULL;
+
 	FILE* f = fopen("data.csv", "r");
 
 	if (f == NULL) {
@@ -211,52 +277,116 @@ int main(int argc, char** argv) {
 			token = strtok_s(NULL, ",", &context);
 			i++;
 		}
-
+		Push(&head, Item);
 	}
 	fclose(f);
 
-	int choice;
 
-	printf("Welcome! \n\nWhat would you like to do?\n\nChoose from the following options:\n\n");
-	printf("[1] - See inventory\n[2] - Add to inventory\n[3] - Delete item from inventory\n[4] - Sort inventory\n[5] - Find item by position\n[6] - Find item by name\n[7] - See total number of items in inventory\n[8] - Exit");
-	printf("\nChoice:");
-	scanf("%d", &choice);
-
+	int choice = NULL;
+	printf("Welcome!");
 
 	while (choice != 8) {
 
+		printf("\n\nWhat would you like to do ? \n\nChoose from the following options : \n\n");
+		printf("[1] - See inventory\n[2] - Add to inventory\n[3] - Delete item from inventory\n[4] - Sort inventory\n[5] - Find item by position\n[6] - Find item by name\n[7] - See total number of items in inventory\n[8] - Exit");
+		printf("\n\nChoice: ");
+		scanf("%d", &choice);
+
+
 		if (choice == 1) {
 
-			PrintInventory();
+			PrintInventory(head);
 		}
 		else if (choice == 2) {
-			Push();
+			int subChoice;
+
+			printf("\n\nWould you like to add [1] a specific item or [2] a random item?\n");
+			printf("\n\nChoice: ");
+			scanf("%d", &subChoice);
+
+			if (subChoice == 1)
+			{
+				Item item;
+				printf("\n\nEnter item name: ");
+				scanf("%s", &item.name);
+				printf("\nEnter item value: ");
+				scanf("%d", &item.value);
+				Push(&head, item);
+			}
+			else if (subChoice == 2)
+			{
+				AddRandomItem(&head, "data.csv");
+			}
 		}
 		else if (choice == 3) {
-			Pop();
+			int subChoice;
+
+			printf("\n\nWould you like to delete item [1] by name or [2] by position?\n\n ");
+			printf("\n\nChoice: ");
+			scanf("%d", &subChoice);
+
+			if (subChoice == 1)
+			{
+				char name[256];
+				printf("\nEnter item name to delete: ");
+				scanf("%s", name);
+				DeleteItemByName(&head, name);
+			}
+			if (subChoice == 2)
+			{
+				int position;
+				printf("\nEnter position of item to delete: ");
+				scanf("%d", &position);
+				DeleteItemByPosition(&head, position);
+			}
 		}
 		else if (choice == 4) {
-			printf("Would you like to sort items [1] by name or [2] by value?\n\n ");
-			scanf("%d", &choice);
+			int subChoice;
+			printf("\n\nWould you like to sort items [1] by name or [2] by value?\n\n ");
+			printf("\n\nChoice: ");
+			scanf("%d", &subChoice);
 
-			if (choice == 1) {
-				AlphabeticalSort();
+			if (subChoice == 1) {
+				SortByName(&head);
 			}
-			else if (choice == 2) {
-
+			else if (subChoice == 2) {
+				SortByValue(&head);
 			}
 		}
 		else if (choice == 5) {
-			FindItemByPosition();
+			int position;
+			printf("\n\nEnter desired item position: ");
+			scanf("%d", &position);
+			Item* foundItem = FindItemByPosition(head, position);
+			if (foundItem != NULL) {
+				printf("\nItem found at position %d:\nItem name: %s\nItem value: %d", position, foundItem->name, foundItem->value);
+			}
+			else {
+				printf("\nNo item was found at position %d\n", position);
+			}
 		}
 		else if (choice == 6) {
-			FindItemByName();
+			char itemName[256];
+			printf("\n\nEnter desired item name: ");
+			scanf("%s", itemName);
+			Item* foundItem = FindItemByName(head, itemName);
+			if (foundItem != NULL) {
+				printf("\nItem found:\nItem name: %s\nItem value: %d", foundItem->name, foundItem->value);
+			}
+			else {
+				printf("\nNo item was found with name: %s\n", itemName);
+			}
+
 		}
 		else if (choice == 7) {
-			ItemQuantity();
+			printf("\n\nThe total number of items currently in inventory is: %d\n", ItemQuantity(head));
+		}
+		else {
+			printf("\n\nPlease choose a valid option from the list\n");
 		}
 	}
-	printf("Goodbye!");
+	printf("\n\nGoodbye!");
+	return 0;
 }
 
 size_t getline(char** lineptr, size_t* n, FILE* stream) {
