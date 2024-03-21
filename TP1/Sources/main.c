@@ -21,7 +21,7 @@ Node* CreateNewNode(Item item) {
 	Node* node = (Node*)malloc(sizeof(Node));
 
 	if (node == NULL) {
-		printf("Error creating node\n");
+		printf("\n\nError creating node\n");
 	}
 	node->data = item;
 	node->prev = NULL;
@@ -50,7 +50,6 @@ Item Pop(Node** head) {
 	if (*head != NULL) {
 		(*head)->prev = NULL;
 	}
-	printf("Item deleted from inventory.");
 	return item;
 }
 
@@ -135,11 +134,6 @@ Item* FindItemByName(Node* head, const char* name)
 
 void DeleteItemByName(Node** head, const char* name)
 {
-	if (name == NULL)
-	{
-		printf("Item not found. Make sure item name is valid.\n");
-		return;
-	}
 	Node* current = *head;
 
 	while (current != NULL)
@@ -147,28 +141,22 @@ void DeleteItemByName(Node** head, const char* name)
 		if (strcmp(current->data.name, name) == 0)
 		{
 			Pop(head);
-			printf("Item named %s  was deleted from inventory.", name);
+			printf("\n\nItem named %s  was deleted from inventory.", name);
 			return;
 		}
 		current = current->next;
 	}
-	printf("No item by the name %s was found in inventory.", name);
+	printf("\n\nNo item by the name %s was found in inventory.", name);
 	return;
 }
 
 void DeleteItemByPosition(Node** head, int position)
 {
-	if (position == NULL)
-	{
-		printf("Item not found. Make sure position is valid.");
-		return;
-	}
-
 	Node* foundItem = FindItemByPosition(*head, position);
 	if (foundItem != NULL)
 	{
 		Pop(head);
-		printf("Item at position %d was successfully deleted from inventory.", position);
+		printf("\n\nItem at position %d was successfully deleted from inventory.", position);
 	}
 }
 
@@ -191,7 +179,7 @@ void AddRandomItem(Node** head, const char* file)
 	FILE* f = fopen(file, "r");
 
 	if (f == NULL) {
-		printf("Error opening file\n");
+		printf("\n\nError opening file\n");
 		return;
 	}
 
@@ -253,7 +241,7 @@ int main(int argc, char** argv) {
 	FILE* f = fopen("data.csv", "r");
 
 	if (f == NULL) {
-		printf("Error opening file\n");
+		printf("\n\nError opening file\n");
 		return;
 	}
 
@@ -359,10 +347,10 @@ int main(int argc, char** argv) {
 			scanf("%d", &position);
 			Item* foundItem = FindItemByPosition(head, position);
 			if (foundItem != NULL) {
-				printf("\nItem found at position %d:\nItem name: %s\nItem value: %d", position, foundItem->name, foundItem->value);
+				printf("\n\nItem found at position %d:\nItem name: %s\nItem value: %d", position, foundItem->name, foundItem->value);
 			}
 			else {
-				printf("\nNo item was found at position %d\n", position);
+				printf("\n\nNo item was found at position %d\n", position);
 			}
 		}
 		else if (choice == 6) {
@@ -371,10 +359,10 @@ int main(int argc, char** argv) {
 			scanf("%s", itemName);
 			Item* foundItem = FindItemByName(head, itemName);
 			if (foundItem != NULL) {
-				printf("\nItem found:\nItem name: %s\nItem value: %d", foundItem->name, foundItem->value);
+				printf("\n\nItem found:\nItem name: %s\nItem value: %d", foundItem->name, foundItem->value);
 			}
 			else {
-				printf("\nNo item was found with name: %s\n", itemName);
+				printf("\n\nNo item was found with name: %s\n", itemName);
 			}
 
 		}
